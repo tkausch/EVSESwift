@@ -27,7 +27,7 @@ import Foundation
 ///
 /// `ChargingFacility` represents a single charging connector or outlet at a charging station,
 /// including information about its power output and connection type.
-public struct ChargingFacility: Codable {
+public struct ChargingFacility: Codable, Sendable {
 
     private enum CodingKeys: String, CodingKey {
         case power = "power"

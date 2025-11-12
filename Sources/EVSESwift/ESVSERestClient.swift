@@ -22,29 +22,26 @@
 // SOFTWARE.
 
 import Foundation
+import SwiftRestRequests
 
+/// REST client for accessing the Swiss EVSE (ich-tanke-strom.ch) dataset hosted on data.geo.admin.ch
+public final class ESVSERestClient: RestApiCaller, EVSEDataFetching {
+    public static let baseURLString = "https://data.geo.admin.ch/ch.bfe.ladestellen-elektromobilitaet/"
+    public static let dataEndpoint = "data/oicp/ch.bfe.ladestellen-elektromobilitaet.json"
 
-
-/// Geographic coordinates for mapping and geolocation services.
-///
-/// Contains coordinate information in a format suitable for mapping applications.
-public struct GeoCoordinates: Codable, Sendable {
-    /// Coordinates in Google Maps format (typically "latitude,longitude" string).
-    ///
-    /// Example: "47.3769,8.5469"
-    let google: String?
-
-    enum CodingKeys: String, CodingKey {
-        case google = "Google"
+    public convenience init() {
+        let base = URL(string: Self.baseURLString)!
+        self.init(baseUrl: base, urlSession: URLSession(configuration: .default), authorizer: nil, errorDeserializer: nil, headerGenerator: nil, enableNetworkTrace: false, httpCookieStorage: nil)
     }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.google = try container.decodeIfPresent(String.self, forKey: .google)
-    }
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encodeIfPresent(google, forKey: .google)
+
+    /// Fetch the EVSE dataset asynchronously using SwiftRestRequests generic GET.
+    /// - Returns: Decoded `EVSEData` root object.
+    /// - Throws: `RestError.failedRestCall` if the status is not OK or decoding fails.
+    public func getEVSEData() async throws -> EVSEData {
+        let (decoded, status) = try await get(EVSEData.self, at: Self.dataEndpoint)
+        guard status == .ok, let decoded else {
+            throw RestError.unexpectedHttpStatusCode(Int(status.rawValue))
+        }
+        return decoded
     }
 }

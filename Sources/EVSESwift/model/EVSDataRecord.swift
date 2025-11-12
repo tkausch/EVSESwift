@@ -32,7 +32,7 @@ import Foundation
 ///
 /// Each EVSE data record wraps a collection of charging stations. This structure serves as
 /// an intermediate container between the API response and the individual charging station data.
-public struct EVSEDataRecord: Codable {
+public struct EVSEDataRecord: Codable, Sendable {
     /// An array of charging stations.
     ///
     /// Each element in this array represents a complete charging station with all its details,

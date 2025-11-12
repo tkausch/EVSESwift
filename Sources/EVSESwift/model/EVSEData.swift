@@ -33,12 +33,12 @@ import Foundation
 /// EVSE stands for "Electric Vehicle Supply Equipment" and refers to the infrastructure that supplies
 /// electrical power to electric vehicles. This structure wraps the array of EVSE data records returned
 /// from the ich-tanke-strom.ch Feature API.
-public struct EVSEData : Codable {
+public struct EVSEData : Codable, Sendable {
     /// An array of EVSE data records.
     ///
     /// Each record contains detailed information about a charging station and its facilities,
     /// as returned from the ich-tanke-strom.ch API.
-    let evseData: [EVSEDataRecord]
+    public let evseData: [EVSEDataRecord]
 
     enum CodingKeys: String, CodingKey {
         case evseData = "EVSEData"

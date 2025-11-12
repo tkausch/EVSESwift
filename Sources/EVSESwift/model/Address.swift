@@ -28,7 +28,7 @@ import Foundation
 ///
 /// `Address` represents the street address and geographic details of an electric vehicle charging station.
 /// All properties are optional to accommodate varying levels of data completeness from different charging point operators.
-public struct Address: Codable {
+public struct Address: Codable, Sendable {
     /// The street name of the charging station location.
     let street: String
     

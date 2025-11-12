@@ -25,7 +25,7 @@
 ///
 /// Provides multilingual support for station names, allowing the same station to be
 /// referenced in multiple languages (e.g., German, French, Italian).
-public struct ChargingStationName: Codable {
+public struct ChargingStationName: Codable, Sendable {
     /// The language code of the name (e.g., "de" for German, "fr" for French, "it" for Italian).
     let lang: String
     

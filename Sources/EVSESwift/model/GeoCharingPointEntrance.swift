@@ -27,7 +27,7 @@ import Foundation
 ///
 /// Provides precise location information for navigating to the actual charging equipment,
 /// which may differ from the main station address.
-public struct GeoChargingPointEntrance: Codable {
+public struct GeoChargingPointEntrance: Codable, Sendable {
     /// Coordinates of the charging point entrance in Google Maps format.
     ///
     /// Example: "47.3769,8.5469"

@@ -35,7 +35,7 @@ import Foundation
 /// A charging station is a physical location that contains one or more charging facilities where
 /// electric vehicles can recharge. Each station has a unique identifier and includes extensive metadata
 /// about its location, available charging options, payment methods, and operational status.
-public struct ChargingStation: Codable {
+public struct ChargingStation: Codable, Sendable {
 
     /// Additional information about accessibility at the location.
     ///
