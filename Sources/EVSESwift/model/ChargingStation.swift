@@ -130,7 +130,7 @@ public struct ChargingStation: Codable, Sendable {
     /// The opening hours or availability information for the station.
     ///
     /// Describes when the station is accessible (e.g., "Mo-Su 06:00-22:00").
-    // let openingTimes: String?
+    let openingTimes: [OpeningTime]?
     
     /// The geographic coordinates of the charging point entrance.
     ///
@@ -194,7 +194,7 @@ public struct ChargingStation: Codable, Sendable {
         case geoCoordinates = "GeoCoordinates"
         case evseID = "EvseID"
         case clearinghouseID = "ClearinghouseID"
-        // case openingTimes = "OpeningTimes"
+        case openingTimes = "OpeningTimes"
         case geoChargingPointEntrance = "GeoChargingPointEntrance"
         case chargingStationLocationReference = "ChargingStationLocationReference"
         case energySource = "EnergySource"
@@ -253,6 +253,7 @@ public struct ChargingStation: Codable, Sendable {
         self.evseID = try container.decode(String.self, forKey: .evseID)
         self.clearinghouseID = try container.decodeIfPresent(String.self, forKey: .clearinghouseID)
         self.geoChargingPointEntrance = try container.decode(GeoCoordinates.self, forKey: .geoChargingPointEntrance)
+        self.openingTimes = try container.decodeIfPresent([OpeningTime].self, forKey: .openingTimes)
         self.chargingStationLocationReference = try container.decodeIfPresent(String.self, forKey: .chargingStationLocationReference)
         self.energySource = try container.decodeIfPresent(String.self, forKey: .energySource)
         self.environmentalImpact = try container.decodeIfPresent(String.self, forKey: .environmentalImpact)
@@ -290,6 +291,7 @@ public struct ChargingStation: Codable, Sendable {
         try container.encode(evseID, forKey: .evseID)
         try container.encodeIfPresent(clearinghouseID, forKey: .clearinghouseID)
         try container.encode(geoChargingPointEntrance, forKey: .geoChargingPointEntrance)
+        try container.encodeIfPresent(openingTimes, forKey: .openingTimes)
         try container.encodeIfPresent(chargingStationLocationReference, forKey: .chargingStationLocationReference)
         try container.encodeIfPresent(energySource, forKey: .energySource)
         try container.encodeIfPresent(environmentalImpact, forKey: .environmentalImpact)

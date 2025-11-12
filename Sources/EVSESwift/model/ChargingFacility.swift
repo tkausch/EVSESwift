@@ -74,52 +74,46 @@ public struct ChargingFacility: Codable, Sendable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
-        // Decode power - can be String, Int, Double, or missing
-        do {
-            self.power = try container.decodeIfPresent(Double.self, forKey: .power)
-        } catch DecodingError.typeMismatch {
-            if let powerValue = try container.decodeIfPresent(String.self, forKey: .power) {
-                guard let powerDouble = Double(powerValue) else {
-                    throw DecodingError.dataCorruptedError(
-                        forKey: .power, in: container,
-                        debugDescription: "Cannot convert power string to Double")
-                }
-                self.power = powerDouble
-            } else {
-                self.power = nil
+        // Decode power - can be Double, String, or missing
+        if let p = try? container.decodeIfPresent(Double.self, forKey: .power) {
+            self.power = p
+        } else if let s = try? container.decodeIfPresent(String.self, forKey: .power) {
+            guard let p = Double(s) else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .power, in: container,
+                    debugDescription: "Cannot convert power string to Double")
             }
+            self.power = p
+        } else {
+            self.power = nil
         }
 
-        // Decode amperage - can be String, Int, or Double
-        do {
-            self.amperage = try container.decodeIfPresent(Double.self, forKey: .amperage)
-        } catch DecodingError.typeMismatch {
-            if let amperageValue = try container.decodeIfPresent(String.self, forKey: .amperage) {
-                guard let amperageDouble = Double(amperageValue) else {
-                    throw DecodingError.dataCorruptedError(
-                        forKey: .amperage, in: container,
-                        debugDescription: "Cannot convert amperage string to Double")
-                }
-                self.amperage = amperageDouble
-            } else {
-                self.amperage = nil
+        // Decode amperage - can be Double, String, or missing
+        if let a = try? container.decodeIfPresent(Double.self, forKey: .amperage) {
+            self.amperage = a
+        } else if let s = try? container.decodeIfPresent(String.self, forKey: .amperage) {
+            guard let a = Double(s) else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .amperage, in: container,
+                    debugDescription: "Cannot convert amperage string to Double")
             }
+            self.amperage = a
+        } else {
+            self.amperage = nil
         }
 
-        // Decode voltage - can be String, Int, or Double
-        do {
-            self.voltage = try container.decodeIfPresent(Double.self, forKey: .voltage)
-        } catch DecodingError.typeMismatch {
-            if let voltageValue = try container.decodeIfPresent(String.self, forKey: .voltage) {
-                guard let voltageDouble = Double(voltageValue) else {
-                    throw DecodingError.dataCorruptedError(
-                        forKey: .voltage, in: container,
-                        debugDescription: "Cannot convert voltage string to Double")
-                }
-                self.voltage = voltageDouble
-            } else {
-                self.voltage = nil
+        // Decode voltage - can be Double, String, or missing
+        if let v = try? container.decodeIfPresent(Double.self, forKey: .voltage) {
+            self.voltage = v
+        } else if let s = try? container.decodeIfPresent(String.self, forKey: .voltage) {
+            guard let v = Double(s) else {
+                throw DecodingError.dataCorruptedError(
+                    forKey: .voltage, in: container,
+                    debugDescription: "Cannot convert voltage string to Double")
             }
+            self.voltage = v
+        } else {
+            self.voltage = nil
         }
 
         self.powerType = try container.decodeIfPresent(String.self, forKey: .powerType)
