@@ -89,7 +89,7 @@ Notes:
 
 ## Usage Examples
 
-### Using ESVSEManager (with automatic caching)
+### Basic Usage
 
 The simplest way to fetch charging stations with persistent caching:
 
@@ -118,57 +118,55 @@ let cachedStations = try await manager.getChargingStations()
 
 // Force refresh from API
 let freshStations = try await manager.getChargingStations(forceRefresh: true)
+```
 
-// Clear cache
-try await manager.clearCache()
+### Querying Stations
+
+ESVSEManager provides convenient query methods:
+
+```swift
+let manager = try ESVSEManager()
+
+// Query by city
+let zurichStations = try await manager.findByCity("Zürich")
+print("Found \(zurichStations.count) stations in Zürich")
+
+// Query by country
+let swissStations = try await manager.findByCountry("CHE")
+
+// Query by postal code
+let localStations = try await manager.findByPostalCode("8001")
+
+// Find stations with specific plug type
+let type2Stations = try await manager.findByPlugType("Type2")
+let ccsStations = try await manager.findByPlugType("CCS")
+
+// Find 24-hour accessible stations
+let alwaysOpen = try await manager.find24HourStations()
+
+// Find renewable energy stations
+let greenStations = try await manager.findRenewableEnergyStations()
+
+// Find specific station by ID
+if let station = try await manager.findById("CH*ABC*E123") {
+    print("Found: \(station.stationName ?? "Unknown")")
+}
+```
+
+### Cache Management
+
+```swift
+let manager = try ESVSEManager()
 
 // Check cache status
 let count = try await manager.getCachedStationCount()
 print("Cached stations: \(count)")
-```
 
-### Working with the Repository directly
+// Clear cache (e.g., to force a full refresh)
+try await manager.clearCache()
 
-For advanced use cases, work directly with the repository:
-
-```swift
-import SwiftData
-import EVSESwift
-
-// Create persistent container
-let container = try ModelContainer(for: ChargingStationModel.self)
-let repository = ChargingStationRepository(container: container)
-
-// Query by city
-let zurichStations = try await repository.findByCity("Zürich")
-
-// Query by country
-let swissStations = try await repository.findByCountry("CHE")
-
-// Find 24-hour stations
-let alwaysOpen = try await repository.find24HourStations()
-
-// Find renewable energy stations
-let greenStations = try await repository.findRenewableEnergyStations()
-
-// Count total stations
-let total = try await repository.countStations()
-```
-
-### Decode a full EVSE dataset (low-level)
-
-```swift
-import EVSESwift
-
-let decoder = JSONDecoder()
-let data = try Data(contentsOf: urlToEVSEDataJson)
-let root = try decoder.decode(EVSEData.self, from: data)
-
-print("Loaded \(root.evseData.count) EVSE data records")
-if let station = root.evseData.first?.evseDataRecord.first {
-    print("First station id: \(station.chargingStationId)")
-    print("Plugs: \(station.plugs.joined(separator: ", "))")
-}
+// Fetch fresh data after clearing
+let fresh = try await manager.getChargingStations()
 ```
 
 ## Data access docs
