@@ -112,9 +112,6 @@ public final class ChargingStationModel {
     /// Indicates whether the station uses renewable energy sources.
     public var renewableEnergy: Bool
     
-    /// The primary energy source for this charging station.
-    public var energySource: String?
-    
     /// Environmental impact information.
     public var environmentalImpact: String?
     
@@ -244,7 +241,6 @@ extension ChargingStationModel {
         self.accessibilityLocation = station.accessibilityLocation
         self.maxCapacity = station.maxCapacity
         // paymentOptions already set in init
-        self.energySource = station.energySource
         self.environmentalImpact = station.environmentalImpact
         self.dynamicPowerLevel = station.dynamicPowerLevel
         self.stationName = station.chargingStationNames.first?.value
