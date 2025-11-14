@@ -29,7 +29,7 @@ import SwiftData
 /// `ChargingFacilityModel` represents a single charging connector or outlet at a charging station,
 /// storing power output specifications and connection type information in the local database.
 @Model
-final class ChargingFacilityModel {
+public final class ChargingFacilityModel {
     
     /// The maximum power output of the charging facility in kilowatts (kW).
     ///
@@ -37,7 +37,7 @@ final class ChargingFacilityModel {
     /// - 3.7 kW for single-phase AC charger
     /// - 11 kW for three-phase AC charger
     /// - 50 kW or higher for fast DC charging
-    var power: Double?
+    public var power: Double?
     
     /// The maximum electrical current (amperage) in amperes (A).
     ///
@@ -45,7 +45,7 @@ final class ChargingFacilityModel {
     /// - 16 A for standard single-phase
     /// - 32 A for higher capacity
     /// - 250+ A for ultra-fast DC
-    var amperage: Double?
+    public var amperage: Double?
     
     /// The electrical voltage in volts (V).
     ///
@@ -53,13 +53,13 @@ final class ChargingFacilityModel {
     /// - 230 V for single-phase AC (Europe)
     /// - 400 V for three-phase AC (Europe)
     /// - 600 V+ for DC fast charging
-    var voltage: Double?
+    public var voltage: Double?
     
     /// The type of charging power (e.g., "AC", "DC", "CHAdeMO", "Type2").
-    var powerType: String?
+    public var powerType: String?
     
     /// The charging station this facility belongs to.
-    var station: ChargingStationModel?
+    public var station: ChargingStationModel?
     
     // MARK: - Initialization
     

@@ -6,6 +6,7 @@
 
 import Foundation
 import Testing
+import SwiftData
 @testable import EVSESwift
 
 @Suite struct EVSEManagerTests {
@@ -26,9 +27,20 @@ import Testing
     let manager: ESVSEManager
     var mock: MockFetcher
 
-    init() {
+    init() throws {
         self.mock = MockFetcher()
-        self.manager = ESVSEManager(fetcher: mock)
+        
+        // Create in-memory container for testing
+        let configuration = ModelConfiguration(
+            isStoredInMemoryOnly: true
+        )
+        let container = try ModelContainer(
+            for: ChargingStationModel.self,
+            configurations: configuration
+        )
+        let repository = ChargingStationRepository(container: container)
+        
+        self.manager = ESVSEManager(fetcher: mock, repository: repository)
     }
 
     @Test func testGetChargingStations() async throws {
@@ -45,11 +57,31 @@ import Testing
     }
 
     @Test func testGetChargingStationsMultipleCalls() async throws {
-        // First call fetches data
+        // First call fetches data and caches it
         let first = try await manager.getChargingStations()
         #expect(first.count > 0)
-        // Second call fetches fresh data
+        
+        // Second call returns cached models
         let second = try await manager.getChargingStations()
         #expect(second.count == first.count)
+    }
+    
+    @Test func testCacheIsUsed() async throws {
+        // Clear cache first
+        try await manager.clearCache()
+        
+        // First call should fetch from API
+        let initialCount = try await manager.getCachedStationCount()
+        #expect(initialCount == 0, "Cache should be empty initially")
+        
+        _ = try await manager.getChargingStations()
+        
+        // Verify cache is populated
+        let cachedCount = try await manager.getCachedStationCount()
+        #expect(cachedCount > 0, "Cache should be populated after first fetch")
+        
+        // Second call should use cache (no network call)
+        let cached = try await manager.getChargingStations()
+        #expect(cached.count == cachedCount)
     }
 }

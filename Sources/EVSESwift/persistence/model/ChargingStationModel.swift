@@ -41,123 +41,123 @@ import SwiftData
 /// try modelContext.save()
 /// ```
 @Model
-final class ChargingStationModel {
+public final class ChargingStationModel {
     
     // MARK: - Core Identifiers
     
     /// The unique identifier for this charging station.
-    @Attribute(.unique) var chargingStationId: String
+    @Attribute(.unique) public var chargingStationId: String
     
     /// The EVSE (Electric Vehicle Supply Equipment) identifier.
-    var evseID: String
+    public var evseID: String
     
     /// The clearinghouse identifier for roaming networks.
-    var clearinghouseID: String?
+    public var clearinghouseID: String?
     
     /// The Hub operator identifier for Hubject-compatible stations.
-    var hubOperatorID: String?
+    public var hubOperatorID: String?
     
     /// The identifier for the charging pool this station belongs to.
-    var chargingPoolID: String?
+    public var chargingPoolID: String?
     
     // MARK: - Location Information
     
     /// The physical address of the charging station.
-    @Relationship(deleteRule: .cascade) var address: AddressModel?
+    @Relationship(deleteRule: .cascade) public var address: AddressModel?
     
     /// Geographic coordinates in Google Maps format (latitude,longitude).
-    var coordinates: String?
+    public var coordinates: String?
     
     /// Geographic coordinates of the charging point entrance.
-    var entranceCoordinates: String?
+    public var entranceCoordinates: String?
     
     /// Additional location reference information.
-    var locationReference: String?
+    public var locationReference: String?
     
     /// URL or reference to an image of the location.
-    var locationImage: String?
+    public var locationImage: String?
     
     // MARK: - Accessibility & Availability
     
     /// Information about accessibility (e.g., "Free publicly accessible", "onStreet").
-    var accessibility: String
+    public var accessibility: String
     
     /// Additional information about accessibility at the location.
-    var accessibilityLocation: String?
+    public var accessibilityLocation: String?
     
     /// Indicates whether the charging station is open 24 hours.
-    var isOpen24Hours: Bool
+    public var isOpen24Hours: Bool
     
     /// Indicates whether dynamic information is available for this station.
-    var dynamicInfoAvailable: String
+    public var dynamicInfoAvailable: String
     
     /// The maximum capacity or parking spaces at this charging station.
-    var maxCapacity: Double?
+    public var maxCapacity: Double?
     
     // MARK: - Charging Capabilities
     
     /// Comma-separated list of plug types available (e.g., "Type2,CCS,CHAdeMO").
-    var plugs: String
+    public var plugs: String
     
     /// Comma-separated list of authentication modes (e.g., "NFC,RFID,APP").
-    var authenticationModes: String
+    public var authenticationModes: String
     
     /// Comma-separated list of payment options (e.g., "CREDIT_CARD,DEBIT_CARD").
-    var paymentOptions: String?
+    public var paymentOptions: String?
     
     /// Indicates whether the station provides calibration law data.
-    var calibrationLawDataAvailability: String
+    public var calibrationLawDataAvailability: String
     
     /// Indicates whether the station uses renewable energy sources.
-    var renewableEnergy: Bool
+    public var renewableEnergy: Bool
     
     /// The primary energy source for this charging station.
-    var energySource: String?
+    public var energySource: String?
     
     /// Environmental impact information.
-    var environmentalImpact: String?
+    public var environmentalImpact: String?
     
     /// The current dynamic power level availability.
-    var dynamicPowerLevel: Bool?
+    public var dynamicPowerLevel: Bool?
     
     // MARK: - Station Information
     
     /// The primary name of the charging station.
-    var stationName: String?
+    public var stationName: String?
     
     /// The phone number for station support or assistance.
-    var hotlinePhoneNumber: String
+    public var hotlinePhoneNumber: String
     
     /// Comma-separated list of value-added services (e.g., "WiFi,RESTAURANT").
-    var valueAddedServices: String?
+    public var valueAddedServices: String?
     
     /// Additional descriptive information about the charging station.
-    var additionalInfo: String?
+    public var additionalInfo: String?
     
     /// The name of the suboperator if different from the main operator.
-    var suboperatorName: String?
+    public var suboperatorName: String?
     
     /// The manufacturer of the charging hardware.
-    var hardwareManufacturer: String?
+    public var hardwareManufacturer: String?
     
     // MARK: - Metadata
     
     /// The type of data change (for update tracking).
-    var deltaType: String?
+    public var deltaType: String?
     
     /// The date this record was last updated.
-    var lastUpdated: Date
+    public var lastUpdated: Date
     
     // MARK: - Relationships
     
     /// The charging facilities available at this station.
-    @Relationship(deleteRule: .cascade) var facilities: [ChargingFacilityModel]?
+    @Relationship(deleteRule: .cascade) public var facilities: [ChargingFacilityModel]?
     
     /// The names of the charging station in different languages.
-    @Relationship(deleteRule: .cascade) var stationNames: [ChargingStationNameModel]?
+    @Relationship(deleteRule: .cascade) public var stationNames: [ChargingStationNameModel]?
     
     /// The opening hours or availability information for the station.
-    @Relationship(deleteRule: .cascade) var openingTimes: [OpeningTimeModel]?
+    @Relationship(deleteRule: .cascade) public var openingTimes: [OpeningTimeModel]?
     
     // MARK: - Initialization
     

@@ -7,6 +7,7 @@ This package provides public, type-safe models and utilities for decoding and us
 ## Highlights
 
 - Public Swift models for EVSE data: EVSEData → EVSEDataRecord → ChargingStation → Address, ChargingFacility, GeoCoordinates, ChargingStationName
+- **Persistent caching with SwiftData**: Automatically caches charging stations locally for offline access and improved performance
 - Robust JSON decoding that tolerates real‑world inconsistencies
   - Booleans encoded as strings (e.g. "IsOpen24Hours": "true")
   - Numbers encoded as strings (e.g. power: "22.0")
@@ -86,17 +87,80 @@ Notes:
 - `lastUpdate` has been removed from the models to simplify parsing.
 - `IsHubjectCompatible` has been removed in favor of a leaner model.
 
-## Decoding examples
+## Usage Examples
 
-### Decode a full EVSE dataset
+### Using ESVSEManager (with automatic caching)
+
+The simplest way to fetch charging stations with persistent caching:
+
+```swift
+import EVSESwift
+
+// Create manager (uses persistent SwiftData cache)
+let manager = try ESVSEManager()
+
+// First call fetches from API and caches
+let stations = try await manager.getChargingStations()
+print("Loaded \(stations.count) charging stations")
+
+// Access station data
+for station in stations.prefix(5) {
+    print("Station: \(station.stationName ?? "Unnamed")")
+    print("  Location: \(station.address?.city ?? "Unknown")")
+    print("  Plugs: \(station.plugs)")
+    if let facilities = station.facilities {
+        print("  Power: \(facilities.first?.power ?? 0) kW")
+    }
+}
+
+// Subsequent calls return cached models instantly (no network)
+let cachedStations = try await manager.getChargingStations()
+
+// Force refresh from API
+let freshStations = try await manager.getChargingStations(forceRefresh: true)
+
+// Clear cache
+try await manager.clearCache()
+
+// Check cache status
+let count = try await manager.getCachedStationCount()
+print("Cached stations: \(count)")
+```
+
+### Working with the Repository directly
+
+For advanced use cases, work directly with the repository:
+
+```swift
+import SwiftData
+import EVSESwift
+
+// Create persistent container
+let container = try ModelContainer(for: ChargingStationModel.self)
+let repository = ChargingStationRepository(container: container)
+
+// Query by city
+let zurichStations = try await repository.findByCity("Zürich")
+
+// Query by country
+let swissStations = try await repository.findByCountry("CHE")
+
+// Find 24-hour stations
+let alwaysOpen = try await repository.find24HourStations()
+
+// Find renewable energy stations
+let greenStations = try await repository.findRenewableEnergyStations()
+
+// Count total stations
+let total = try await repository.countStations()
+```
+
+### Decode a full EVSE dataset (low-level)
 
 ```swift
 import EVSESwift
 
 let decoder = JSONDecoder()
-// If your dataset contains ISO8601 strings you want to decode elsewhere:
-// decoder.dateDecodingStrategy = .iso8601Flexible
-
 let data = try Data(contentsOf: urlToEVSEDataJson)
 let root = try decoder.decode(EVSEData.self, from: data)
 
@@ -104,29 +168,6 @@ print("Loaded \(root.evseData.count) EVSE data records")
 if let station = root.evseData.first?.evseDataRecord.first {
     print("First station id: \(station.chargingStationId)")
     print("Plugs: \(station.plugs.joined(separator: ", "))")
-}
-```
-
-### Fetch JSON and decode using SwiftRestRequests
-
-```swift
-import EVSESwift
-import SwiftRestRequests
-
-let request = RestRequest(url: "https://example.com/EVSEData.json")
-request.get { result in
-    switch result {
-    case .success(let response):
-        do {
-            let decoder = JSONDecoder()
-            let root = try decoder.decode(EVSEData.self, from: response.data)
-            print("Stations: \(root.evseData.first?.evseDataRecord.count ?? 0)")
-        } catch {
-            print("Decoding failed: \(error)")
-        }
-    case .failure(let error):
-        print("Request failed: \(error)")
-    }
 }
 ```
 

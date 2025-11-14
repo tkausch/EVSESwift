@@ -29,16 +29,16 @@ import SwiftData
 /// `ChargingStationNameModel` stores the name of a charging station in a specific language,
 /// supporting multilingual station naming (e.g., German, French, Italian).
 @Model
-final class ChargingStationNameModel {
+public final class ChargingStationNameModel {
     
     /// The language code of the name (e.g., "de", "fr", "it", "en").
-    var lang: String
+    public var lang: String
     
     /// The charging station name in the specified language.
-    var value: String
+    public var value: String
     
     /// The charging station this name belongs to.
-    var station: ChargingStationModel?
+    public var station: ChargingStationModel?
     
     // MARK: - Initialization
     

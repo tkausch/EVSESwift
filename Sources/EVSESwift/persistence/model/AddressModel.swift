@@ -29,40 +29,40 @@ import SwiftData
 /// `AddressModel` represents the street address and geographic details of a location,
 /// typically used as part of a charging station's location information.
 @Model
-final class AddressModel {
+public final class AddressModel {
     
     /// The street name of the location.
-    var street: String
+    public var street: String
     
     /// The house number of the location.
-    var houseNum: String?
+    public var houseNum: String?
     
     /// The postal code of the location.
-    var postalCode: String?
+    public var postalCode: String?
     
     /// The city name where the location is.
-    var city: String
+    public var city: String
     
     /// The region or state where the location is.
-    var region: String?
+    public var region: String?
     
     /// The country where the location is.
-    var country: String
+    public var country: String
     
     /// The time zone of the location (e.g., "Europe/Zurich").
-    var timeZone: String?
+    public var timeZone: String?
     
     /// The floor number if the location is within a building.
-    var floor: String?
+    public var floor: String?
     
     /// The specific parking spot identifier.
-    var parkingSpot: String?
+    public var parkingSpot: String?
     
     /// Indicates if there is a parking facility.
-    var parkingFacility: Bool?
+    public var parkingFacility: Bool?
     
     /// The charging station this address belongs to.
-    var station: ChargingStationModel?
+    public var station: ChargingStationModel?
     
     // MARK: - Initialization
     

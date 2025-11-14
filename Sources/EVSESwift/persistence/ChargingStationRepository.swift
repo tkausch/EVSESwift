@@ -28,13 +28,13 @@ import SwiftData
 ///
 /// This class provides asynchronous CRUD operations for ChargingStationModel entities.
 /// All database operations create their own context for isolation.
-class ChargingStationRepository: ModelRepository {
+public class ChargingStationRepository: ModelRepository {
    
-    typealias T = ChargingStationModel
+    public typealias T = ChargingStationModel
     
-    let container: ModelContainer
+    public let container: ModelContainer
     
-    init(container: ModelContainer) {
+    public init(container: ModelContainer) {
         self.container = container
     }
 }

@@ -29,16 +29,16 @@ import SwiftData
 /// `PeriodModel` represents a time window during which a charging station is accessible,
 /// with begin and end times in HH:mm format.
 @Model
-final class PeriodModel {
+public final class PeriodModel {
     
     /// The begin time in HH:mm format (e.g., "08:00").
-    var begin: String
+    public var begin: String
     
     /// The end time in HH:mm format (e.g., "17:30").
-    var end: String
+    public var end: String
     
     /// The opening time this period belongs to.
-    var openingTime: OpeningTimeModel?
+    public var openingTime: OpeningTimeModel?
     
     // MARK: - Initialization
     
@@ -65,19 +65,19 @@ final class PeriodModel {
 /// `OpeningTimeModel` represents the operating hours for a charging station on a specific day,
 /// containing one or more time periods when the station is accessible.
 @Model
-final class OpeningTimeModel {
+public final class OpeningTimeModel {
     
     /// The day of the week (stored as string for compatibility with Day enum).
     ///
     /// Common values: "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
     /// "Saturday", "Sunday", "Workdays", "Everyday", "Weekend"
-    var dayOfWeek: String
+    public var dayOfWeek: String
     
     /// The time periods when the station is accessible on this day.
-    @Relationship(deleteRule: .cascade) var periods: [PeriodModel]?
+    @Relationship(deleteRule: .cascade) public var periods: [PeriodModel]?
     
     /// The charging station these opening times belong to.
-    var station: ChargingStationModel?
+    public var station: ChargingStationModel?
     
     // MARK: - Initialization
     
