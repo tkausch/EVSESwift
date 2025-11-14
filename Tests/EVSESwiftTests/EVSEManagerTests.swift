@@ -33,7 +33,7 @@ import Testing
 
     @Test func testGetChargingStations() async throws {
         do {
-            let stations = try await manager.getChargingStations(useCache: true)
+            let stations = try await manager.getChargingStations()
             #expect(stations.count > 0, "Should return at least one charging station")
             if let first = stations.first {
                 print("Station ID: \(first.chargingStationId)")
@@ -44,12 +44,12 @@ import Testing
         }
     }
 
-    @Test func testGetChargingStationsCaching() async throws {
-        // First call populates cache
-        let first = try await manager.getChargingStations(useCache: true)
+    @Test func testGetChargingStationsMultipleCalls() async throws {
+        // First call fetches data
+        let first = try await manager.getChargingStations()
         #expect(first.count > 0)
-        // Second call should use cache and avoid incrementing calls if we tracked it
-        let second = try await manager.getChargingStations(useCache: true)
+        // Second call fetches fresh data
+        let second = try await manager.getChargingStations()
         #expect(second.count == first.count)
     }
 }
