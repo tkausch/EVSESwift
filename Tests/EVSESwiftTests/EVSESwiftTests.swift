@@ -146,4 +146,35 @@ import Testing
             print("Station coordinates: \(coords)")
         }
     }
+    
+    /// Test parsing of lastUpdate date field
+    @Test func testLastUpdateParsing() async throws {
+
+        // Get stations and verify lastUpdate field
+        var stationsWithLastUpdate = 0
+        var dateFormats: [String] = []
+        
+        for record in evseData.evseData {
+            for station in record.evseDataRecord.prefix(3) {
+                if let lastUpdate = station.lastUpdate {
+                    stationsWithLastUpdate += 1
+                    
+                    // Format date for display
+                    let formatter = ISO8601DateFormatter()
+                    formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+                    dateFormats.append(formatter.string(from: lastUpdate))
+                }
+            }
+        }
+        
+        #expect(stationsWithLastUpdate > 0, "Should have stations with lastUpdate dates")
+        
+        print("Stations with lastUpdate: \(stationsWithLastUpdate)")
+        if !dateFormats.isEmpty {
+            print("Sample lastUpdate dates:")
+            for (index, dateStr) in dateFormats.prefix(3).enumerated() {
+                print("  \(index + 1). \(dateStr)")
+            }
+        }
+    }
 }
