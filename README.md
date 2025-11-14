@@ -173,10 +173,8 @@ let fresh = try await manager.getChargingStations()
 
 For official API details, see:
 
-- How to query the ich-tanke-strom.ch Feature API
-  https://github.com/SFOE/ichtankestrom_Documentation/blob/main/How%20to%20query%20ich%20tanke%20strom.md
-- Access/Download the data
-  https://github.com/SFOE/ichtankestrom_Documentation/blob/main/Access%20Download%20the%20data.md
+- [How to query the ich-tanke-strom.ch Feature API](https://github.com/SFOE/ichtankestrom_Documentation/blob/main/How%20to%20query%20ich%20tanke%20strom.md)
+- [Access/Download the data](https://github.com/SFOE/ichtankestrom_Documentation/blob/main/Access%20Download%20the%20data.md)
 
 ## License
 
@@ -186,10 +184,10 @@ MIT — see LICENSE.
 
 ## Related resources
 
-- ich-tanke-strom.ch Documentation: https://github.com/SFOE/ichtankestrom_Documentation
-- recharge-my-car.ch Map: https://www.recharge-my-car.ch/
-- Open Data on opendata.swiss: https://opendata.swiss/en/dataset/ladestationen-fuer-elektroautos
-- Swiss Office of Energy (SFOE): https://www.bfe.admin.ch/
+- [ich-tanke-strom.ch Documentation](https://github.com/SFOE/ichtankestrom_Documentation)
+- [recharge-my-car.ch Map](https://www.recharge-my-car.ch/)
+- [Open Data on opendata.swiss](https://opendata.swiss/en/dataset/ladestationen-fuer-elektroautos)
+- [Swiss Office of Energy (SFOE)](https://www.bfe.admin.ch/)
 
 ## Contributing
 
