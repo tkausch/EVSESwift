@@ -49,8 +49,8 @@ public struct ChargingStation: Codable, Sendable {
     
     /// The authentication methods accepted at this charging station.
     ///
-    /// Examples include: "NFC", "RFID", "QR_CODE", "APP", "CABLE_LOCK", etc.
-    let authenticationModes: [String]
+    /// Examples: REMOTE, NFC RFID Classic, NFC RFID DESFire, Direct Payment, PnC
+    let authenticationModes: [AuthenticationMode]
     
     /// Information about calibration law data availability.
     ///
@@ -88,7 +88,16 @@ public struct ChargingStation: Codable, Sendable {
     
     /// The plug or connector types available at this station.
     ///
-    /// Examples: "Type2", "CCS", "CHAdeMO", "Tesla", "Schuko", etc.
+    /// Examples: 
+    /// "Type 2 Outlet" - 12,962 occurrences (most common)
+    /// "CCS Combo 2 Plug (Cable Attached)" - 3,158 occurrences
+    /// "CHAdeMO" - 683 occurrences
+    /// "Tesla Connector" - 444 occurrences
+    /// "Type 1 Connector (Cable Attached)" - 326 occurrences
+    /// "Type 2 Connector (Cable Attached)" - 273 occurrences
+    /// "Type J Swiss Standard" - 9 occurrences
+    /// "Type F Schuko" - 5 occurrences
+    /// "CCS Combo 1 Plug (Cable Attached)" - 1 occurrence
     let plugs: [String]
     
     /// Indicates whether the station uses renewable energy sources.
@@ -214,7 +223,7 @@ public struct ChargingStation: Codable, Sendable {
         
         self.accessibilityLocation = try container.decodeIfPresent(String.self, forKey: .accessibilityLocation)
         self.address = try container.decode(Address.self, forKey: .address)
-        self.authenticationModes = try container.decode([String].self, forKey: .authenticationModes)
+        self.authenticationModes = try container.decode([AuthenticationMode].self, forKey: .authenticationModes)
         self.calibrationLawDataAvailability = try container.decode(String.self, forKey: .calibrationLawDataAvailability)
         self.chargingFacilities = try container.decode([ChargingFacility].self, forKey: .chargingFacilities)
         

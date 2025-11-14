@@ -99,8 +99,8 @@ public final class ChargingStationModel {
     /// Comma-separated list of plug types available (e.g., "Type2,CCS,CHAdeMO").
     public var plugs: String
     
-    /// Comma-separated list of authentication modes (e.g., "NFC,RFID,APP").
-    public var authenticationModes: String
+    /// Authentication modes accepted at this charging station.
+    public var authenticationModes: [AuthenticationMode]
     
     /// Payment options accepted at this charging station.
     public var paymentOptions: [PaymentOption]
@@ -182,7 +182,7 @@ public final class ChargingStationModel {
         accessibility: String,
         isOpen24Hours: Bool = false,
         plugs: String = "",
-        authenticationModes: String = "",
+        authenticationModes: [AuthenticationMode] = [],
         paymentOptions: [PaymentOption] = [],
         hotlinePhoneNumber: String = "",
         calibrationLawDataAvailability: String = "",
@@ -222,7 +222,7 @@ extension ChargingStationModel {
             accessibility: station.accessibility,
             isOpen24Hours: station.isOpen24Hours,
             plugs: station.plugs.joined(separator: ","),
-            authenticationModes: station.authenticationModes.joined(separator: ","),
+            authenticationModes: station.authenticationModes,
             paymentOptions: station.paymentOptions ?? [],
             hotlinePhoneNumber: station.hotlinePhoneNumber,
             calibrationLawDataAvailability: station.calibrationLawDataAvailability,
