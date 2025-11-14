@@ -76,15 +76,15 @@ public struct ChargingStation: Codable, Sendable {
     let hotlinePhoneNumber: String
     
     /// The Hub operator identifier for Hubject-compatible stations.
-        let hubOperatorID: String?
+    let hubOperatorID: String?
     
     /// Indicates whether the charging station is open 24 hours.
     let isOpen24Hours: Bool
     
     /// The payment methods accepted at this charging station.
     ///
-    /// Examples: "CREDIT_CARD", "DEBIT_CARD", "DIRECT_DEBIT", "PHONE", etc.
-        let paymentOptions: [String]?
+    /// Examples: Direct, Contract, No Payment
+    let paymentOptions: [PaymentOption]?
     
     /// The plug or connector types available at this station.
     ///
@@ -242,7 +242,7 @@ public struct ChargingStation: Codable, Sendable {
             let stringValue = try container.decode(String.self, forKey: .isOpen24Hours)
             self.isOpen24Hours = stringValue.lowercased() == "true"
         }
-        self.paymentOptions = try container.decodeIfPresent([String].self, forKey: .paymentOptions)
+        self.paymentOptions = try container.decodeIfPresent([PaymentOption].self, forKey: .paymentOptions)
         self.plugs = try container.decode([String].self, forKey: .plugs)
         self.renewableEnergy = try container.decode(Bool.self, forKey: .renewableEnergy)
         self.valueAddedServices = try container.decodeIfPresent([String].self, forKey: .valueAddedServices)

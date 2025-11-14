@@ -55,7 +55,7 @@ public final class ChargingStationModel {
     public var clearinghouseID: String?
     
     /// The Hub operator identifier for Hubject-compatible stations.
-    public var hubOperatorID: String?
+    public var hubOperatorID: String
     
     /// The identifier for the charging pool this station belongs to.
     public var chargingPoolID: String?
@@ -102,8 +102,8 @@ public final class ChargingStationModel {
     /// Comma-separated list of authentication modes (e.g., "NFC,RFID,APP").
     public var authenticationModes: String
     
-    /// Comma-separated list of payment options (e.g., "CREDIT_CARD,DEBIT_CARD").
-    public var paymentOptions: String?
+    /// Payment options accepted at this charging station.
+    public var paymentOptions: [PaymentOption]
     
     /// Indicates whether the station provides calibration law data.
     public var calibrationLawDataAvailability: String
@@ -166,6 +166,7 @@ public final class ChargingStationModel {
     /// - Parameters:
     ///   - chargingStationId: The unique identifier for the charging station.
     ///   - evseID: The EVSE identifier.
+    ///   - hubOperatorID: The Hub operator identifier.
     ///   - accessibility: The accessibility information.
     ///   - isOpen24Hours: Whether the station is open 24 hours.
     ///   - plugs: Available plug types as comma-separated string.
@@ -177,10 +178,12 @@ public final class ChargingStationModel {
     init(
         chargingStationId: String,
         evseID: String,
+        hubOperatorID: String,
         accessibility: String,
         isOpen24Hours: Bool = false,
         plugs: String = "",
         authenticationModes: String = "",
+        paymentOptions: [PaymentOption] = [],
         hotlinePhoneNumber: String = "",
         calibrationLawDataAvailability: String = "",
         dynamicInfoAvailable: String = "",
@@ -188,10 +191,12 @@ public final class ChargingStationModel {
     ) {
         self.chargingStationId = chargingStationId
         self.evseID = evseID
+        self.hubOperatorID = hubOperatorID
         self.accessibility = accessibility
         self.isOpen24Hours = isOpen24Hours
         self.plugs = plugs
         self.authenticationModes = authenticationModes
+        self.paymentOptions = paymentOptions
         self.hotlinePhoneNumber = hotlinePhoneNumber
         self.calibrationLawDataAvailability = calibrationLawDataAvailability
         self.dynamicInfoAvailable = dynamicInfoAvailable
@@ -213,10 +218,12 @@ extension ChargingStationModel {
         self.init(
             chargingStationId: station.chargingStationId,
             evseID: station.evseID,
+            hubOperatorID: station.hubOperatorID ?? "",
             accessibility: station.accessibility,
             isOpen24Hours: station.isOpen24Hours,
             plugs: station.plugs.joined(separator: ","),
             authenticationModes: station.authenticationModes.joined(separator: ","),
+            paymentOptions: station.paymentOptions ?? [],
             hotlinePhoneNumber: station.hotlinePhoneNumber,
             calibrationLawDataAvailability: station.calibrationLawDataAvailability,
             dynamicInfoAvailable: station.dynamicInfoAvailable,
@@ -228,7 +235,6 @@ extension ChargingStationModel {
         
         // Optional fields
         self.clearinghouseID = station.clearinghouseID
-        self.hubOperatorID = station.hubOperatorID
         self.chargingPoolID = station.chargingPoolID
         self.coordinates = station.geoCoordinates.google
         self.entranceCoordinates = station.geoChargingPointEntrance.google
@@ -236,7 +242,7 @@ extension ChargingStationModel {
         self.locationImage = station.locationImage
         self.accessibilityLocation = station.accessibilityLocation
         self.maxCapacity = station.maxCapacity
-        self.paymentOptions = station.paymentOptions?.joined(separator: ",")
+        // paymentOptions already set in init
         self.energySource = station.energySource
         self.environmentalImpact = station.environmentalImpact
         self.dynamicPowerLevel = station.dynamicPowerLevel

@@ -31,16 +31,15 @@ import SwiftData
         self.mock = MockFetcher()
         
         // Create in-memory container for testing
-        let configuration = ModelConfiguration(
-            isStoredInMemoryOnly: true
-        )
         let container = try ModelContainer(
             for: ChargingStationModel.self,
-            configurations: configuration
+            ChargingPointOperatorModel.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let repository = ChargingStationRepository(container: container)
+        let operatorRepository = ChargingPointOperatorRepository(container: container)
         
-        self.manager = ESVSEManager(fetcher: mock, repository: repository)
+        self.manager = ESVSEManager(fetcher: mock, repository: repository, operatorRepository: operatorRepository)
     }
 
     @Test func testGetChargingStations() async throws {
