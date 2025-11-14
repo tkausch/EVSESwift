@@ -48,7 +48,7 @@ extension ChargingStationRepository {
     /// - Parameter city: The city name to search for.
     /// - Returns: An array of charging stations in the specified city.
     /// - Throws: An error if the fetch operation fails.
-    func findByCity(_ city: String) async throws -> [ChargingStationModel] {
+    public func findByCity(_ city: String) async throws -> [ChargingStationModel] {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>(
             predicate: #Predicate { station in
@@ -64,7 +64,7 @@ extension ChargingStationRepository {
     /// - Parameter plugType: The plug type to search for (e.g., "Type2", "CCS").
     /// - Returns: An array of charging stations with the specified plug type.
     /// - Throws: An error if the fetch operation fails.
-    func findByPlugType(_ plugType: String) async throws -> [ChargingStationModel] {
+    public func findByPlugType(_ plugType: String) async throws -> [ChargingStationModel] {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>(
             predicate: #Predicate { station in
@@ -80,7 +80,7 @@ extension ChargingStationRepository {
     /// - Parameter id: The charging station ID.
     /// - Returns: The charging station if found, nil otherwise.
     /// - Throws: An error if the fetch operation fails.
-    func findById(_ id: String) async throws -> ChargingStationModel? {
+    public func findById(_ id: String) async throws -> ChargingStationModel? {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>(
             predicate: #Predicate { station in
@@ -94,7 +94,7 @@ extension ChargingStationRepository {
     ///
     /// - Returns: An array of charging stations that are open 24 hours.
     /// - Throws: An error if the fetch operation fails.
-    func find24HourStations() async throws -> [ChargingStationModel] {
+    public func find24HourStations() async throws -> [ChargingStationModel] {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>(
             predicate: #Predicate { station in
@@ -109,7 +109,7 @@ extension ChargingStationRepository {
     ///
     /// - Returns: An array of charging stations that use renewable energy.
     /// - Throws: An error if the fetch operation fails.
-    func findRenewableEnergyStations() async throws -> [ChargingStationModel] {
+    public func findRenewableEnergyStations() async throws -> [ChargingStationModel] {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>(
             predicate: #Predicate { station in
@@ -125,7 +125,7 @@ extension ChargingStationRepository {
     /// - Parameter country: The country name to search for.
     /// - Returns: An array of charging stations in the specified country.
     /// - Throws: An error if the fetch operation fails.
-    func findByCountry(_ country: String) async throws -> [ChargingStationModel] {
+    public func findByCountry(_ country: String) async throws -> [ChargingStationModel] {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>(
             predicate: #Predicate { station in
@@ -144,7 +144,7 @@ extension ChargingStationRepository {
     /// - Parameter postalCode: The postal code to search for.
     /// - Returns: An array of charging stations in the specified postal code area.
     /// - Throws: An error if the fetch operation fails.
-    func findByPostalCode(_ postalCode: String) async throws -> [ChargingStationModel] {
+    public func findByPostalCode(_ postalCode: String) async throws -> [ChargingStationModel] {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>(
             predicate: #Predicate { station in
@@ -159,7 +159,7 @@ extension ChargingStationRepository {
     ///
     /// - Returns: The total count of charging stations.
     /// - Throws: An error if the fetch operation fails.
-    func countStations() async throws -> Int {
+    public func countStations() async throws -> Int {
         let context = ModelContext(container)
         let descriptor = FetchDescriptor<ChargingStationModel>()
         return try context.fetchCount(descriptor)
@@ -168,7 +168,7 @@ extension ChargingStationRepository {
     /// Deletes all charging stations from the database.
     ///
     /// - Throws: An error if the delete operation fails.
-    func deleteAll() async throws {
+    public func deleteAll() async throws {
         let context = ModelContext(container)
         try context.delete(model: ChargingStationModel.self)
         try context.save()

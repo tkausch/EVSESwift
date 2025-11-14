@@ -52,7 +52,7 @@ public final class ESVSEManager {
     public func getChargingStations(forceRefresh: Bool = false) async throws -> [ChargingStationModel] {
         // Check cache first unless forceRefresh is requested
         if !forceRefresh {
-            let cachedModels = try await repository.read(sortBy: SortDescriptor(\ChargingStationModel.chargingStationId))
+            let cachedModels: [ChargingStationModel] = try await repository.read(sortBy: SortDescriptor(\ChargingStationModel.chargingStationId))
             if !cachedModels.isEmpty {
                 return cachedModels
             }
@@ -77,6 +77,69 @@ public final class ESVSEManager {
     /// Returns the number of cached stations.
     public func getCachedStationCount() async throws -> Int {
         return try await repository.countStations()
+    }
+    
+    // MARK: - Query Methods
+    
+    /// Finds all charging stations in a specific city.
+    ///
+    /// - Parameter city: The city name to search for.
+    /// - Returns: An array of charging stations in the specified city.
+    /// - Throws: An error if the fetch operation fails.
+    public func findByCity(_ city: String) async throws -> [ChargingStationModel] {
+        return try await repository.findByCity(city)
+    }
+    
+    /// Finds all charging stations in a specific country.
+    ///
+    /// - Parameter country: The country name to search for.
+    /// - Returns: An array of charging stations in the specified country.
+    /// - Throws: An error if the fetch operation fails.
+    public func findByCountry(_ country: String) async throws -> [ChargingStationModel] {
+        return try await repository.findByCountry(country)
+    }
+    
+    /// Finds all charging stations with a specific postal code.
+    ///
+    /// - Parameter postalCode: The postal code to search for.
+    /// - Returns: An array of charging stations in the specified postal code area.
+    /// - Throws: An error if the fetch operation fails.
+    public func findByPostalCode(_ postalCode: String) async throws -> [ChargingStationModel] {
+        return try await repository.findByPostalCode(postalCode)
+    }
+    
+    /// Finds all charging stations with a specific plug type.
+    ///
+    /// - Parameter plugType: The plug type to search for (e.g., "Type2", "CCS").
+    /// - Returns: An array of charging stations with the specified plug type.
+    /// - Throws: An error if the fetch operation fails.
+    public func findByPlugType(_ plugType: String) async throws -> [ChargingStationModel] {
+        return try await repository.findByPlugType(plugType)
+    }
+    
+    /// Finds a charging station by its unique identifier.
+    ///
+    /// - Parameter id: The charging station ID.
+    /// - Returns: The charging station if found, nil otherwise.
+    /// - Throws: An error if the fetch operation fails.
+    public func findById(_ id: String) async throws -> ChargingStationModel? {
+        return try await repository.findById(id)
+    }
+    
+    /// Finds all 24-hour accessible charging stations.
+    ///
+    /// - Returns: An array of charging stations that are open 24 hours.
+    /// - Throws: An error if the fetch operation fails.
+    public func find24HourStations() async throws -> [ChargingStationModel] {
+        return try await repository.find24HourStations()
+    }
+    
+    /// Finds all charging stations using renewable energy.
+    ///
+    /// - Returns: An array of charging stations that use renewable energy.
+    /// - Throws: An error if the fetch operation fails.
+    public func findRenewableEnergyStations() async throws -> [ChargingStationModel] {
+        return try await repository.findRenewableEnergyStations()
     }
     
     // MARK: - Private Methods
