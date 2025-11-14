@@ -25,9 +25,10 @@ import Foundation
 import SwiftRestRequests
 
 /// REST client for accessing the Swiss EVSE (ich-tanke-strom.ch) dataset hosted on data.geo.admin.ch
-public final class ESVSERestClient: RestApiCaller, EVSEDataFetching {
+public final class ESVSERestClient: RestApiCaller, EVSEDataFetching, EVSEStatusesFetching {
     public static let baseURLString = "https://data.geo.admin.ch/ch.bfe.ladestellen-elektromobilitaet/"
     public static let dataEndpoint = "data/oicp/ch.bfe.ladestellen-elektromobilitaet.json"
+    public static let statusEndpoint = "status/oicp/ch.bfe.ladestellen-elektromobilitaet.json"
 
     public convenience init() {
         let base = URL(string: Self.baseURLString)!
@@ -39,6 +40,17 @@ public final class ESVSERestClient: RestApiCaller, EVSEDataFetching {
     /// - Throws: `RestError.failedRestCall` if the status is not OK or decoding fails.
     public func getEVSEData() async throws -> EVSEData {
         let (decoded, status) = try await get(EVSEData.self, at: Self.dataEndpoint)
+        guard status == .ok, let decoded else {
+            throw RestError.unexpectedHttpStatusCode(Int(status.rawValue))
+        }
+        return decoded
+    }
+
+    /// Fetch the EVSE status dataset asynchronously using SwiftRestRequests generic GET.
+    /// - Returns: Decoded `EVSEStatuses` root object containing real-time status information.
+    /// - Throws: `RestError.failedRestCall` if the status is not OK or decoding fails.
+    public func getEVSEStatuses() async throws -> EVSEStatuses {
+        let (decoded, status) = try await get(EVSEStatuses.self, at: Self.statusEndpoint)
         guard status == .ok, let decoded else {
             throw RestError.unexpectedHttpStatusCode(Int(status.rawValue))
         }

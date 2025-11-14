@@ -49,7 +49,7 @@ public final class ChargingStationModel {
     @Attribute(.unique) public var chargingStationId: String
     
     /// The EVSE (Electric Vehicle Supply Equipment) identifier.
-    public var evseID: String
+    @Attribute(.unique) public var evseID: String
     
     /// The clearinghouse identifier for roaming networks.
     public var clearinghouseID: String?
@@ -89,7 +89,8 @@ public final class ChargingStationModel {
     public var isOpen24Hours: Bool
     
     /// Indicates whether dynamic information is available for this station.
-    public var dynamicInfoAvailable: String
+    /// Values: yes (true), no (false), or auto (automatically determined)
+    public var dynamicInfoAvailable: DynamicInfoAvailable
     
     /// The maximum capacity or parking spaces at this charging station.
     public var maxCapacity: Double?
@@ -186,7 +187,7 @@ public final class ChargingStationModel {
         paymentOptions: [PaymentOption] = [],
         hotlinePhoneNumber: String = "",
         calibrationLawDataAvailability: String = "",
-        dynamicInfoAvailable: String = "",
+        dynamicInfoAvailable: DynamicInfoAvailable = .no,
         renewableEnergy: Bool = false
     ) {
         self.chargingStationId = chargingStationId

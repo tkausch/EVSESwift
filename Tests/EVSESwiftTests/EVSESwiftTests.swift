@@ -26,7 +26,7 @@ import Testing
 
 @testable import EVSESwift
 
-@Suite struct EVSESwiftTests {
+@Suite struct EVSEDataTests {
 
     var evseData: EVSEData
 

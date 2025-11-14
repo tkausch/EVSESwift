@@ -25,7 +25,12 @@ import Foundation
 
 /// A description
 extension JSONDecoder.DateDecodingStrategy {
-    /// A flexible ISO8601 strategy that supports dates with or without fractional seconds.
+    /// A flexible ISO8601 strategy that supports dates with or without fractional seconds and timezone.
+    ///
+    /// Supports three formats:
+    /// 1. ISO8601 with fractional seconds and timezone: "2025-09-30T02:15:16.965Z"
+    /// 2. ISO8601 with timezone: "2025-09-30T02:15:16Z"
+    /// 3. ISO8601 without timezone: "2022-10-26T10:02:07" (assumes UTC)
     static let iso8601Flexible = custom { decoder in
         let container = try decoder.singleValueContainer()
         let dateString = try container.decode(String.self)
@@ -38,11 +43,20 @@ extension JSONDecoder.DateDecodingStrategy {
             return date
         }
 
-        // Fallback: try without fractional seconds
+        // Fallback: try without fractional seconds but with timezone
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withInternetDateTime]
 
         if let date = isoFormatter.date(from: dateString) {
+            return date
+        }
+
+        // Fallback: try without timezone (assumes UTC)
+        let isoFormatterNoTZ = ISO8601DateFormatter()
+        isoFormatterNoTZ.formatOptions = [.withFullDate, .withTime, .withColonSeparatorInTime, .withDashSeparatorInDate]
+        isoFormatterNoTZ.timeZone = TimeZone(secondsFromGMT: 0) // Assume UTC
+
+        if let date = isoFormatterNoTZ.date(from: dateString) {
             return date
         }
 

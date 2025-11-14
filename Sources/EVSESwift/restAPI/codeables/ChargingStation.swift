@@ -70,7 +70,8 @@ public struct ChargingStation: Codable, Sendable {
     /// Indicates whether dynamic information is available for this station.
     ///
     /// Dynamic information includes real-time availability, current power levels, and occupancy status.
-    let dynamicInfoAvailable: String
+    /// Values: yes (true), no (false), or auto (automatically determined)
+    let dynamicInfoAvailable: DynamicInfoAvailable
     
     /// The phone number for station support or assistance.
     let hotlinePhoneNumber: String
@@ -181,6 +182,12 @@ public struct ChargingStation: Codable, Sendable {
     
     /// The manufacturer of the charging hardware.
     let hardwareManufacturer: String?
+    
+    /// The timestamp of the last update to this charging station's information.
+    ///
+    /// This date indicates when the station data was last modified in the source system.
+    /// Supports multiple ISO8601 formats including with and without fractional seconds.
+    let lastUpdate: Date?
 
     enum CodingKeys: String, CodingKey {
         case accessibilityLocation = "AccessibilityLocation"
@@ -215,6 +222,7 @@ public struct ChargingStation: Codable, Sendable {
         case chargingPoolID = "ChargingPoolID"
         case dynamicPowerLevel = "DynamicPowerLevel"
         case hardwareManufacturer = "HardwareManufacturer"
+        case lastUpdate = "lastUpdate"
     }
     
     // Custom decoding to handle flexible field types
@@ -240,7 +248,7 @@ public struct ChargingStation: Codable, Sendable {
             }
         }
         
-        self.dynamicInfoAvailable = try container.decode(String.self, forKey: .dynamicInfoAvailable)
+        self.dynamicInfoAvailable = try container.decode(DynamicInfoAvailable.self, forKey: .dynamicInfoAvailable)
         self.hotlinePhoneNumber = try container.decode(String.self, forKey: .hotlinePhoneNumber)
         self.hubOperatorID = try container.decodeIfPresent(String.self, forKey: .hubOperatorID)
         
@@ -273,6 +281,16 @@ public struct ChargingStation: Codable, Sendable {
         self.chargingPoolID = try container.decodeIfPresent(String.self, forKey: .chargingPoolID)
         self.dynamicPowerLevel = try container.decodeIfPresent(Bool.self, forKey: .dynamicPowerLevel)
         self.hardwareManufacturer = try container.decodeIfPresent(String.self, forKey: .hardwareManufacturer)
+        
+        // Handle lastUpdate - can be Date string (ISO8601) or Unix timestamp (Double)
+        // Try Date string first (most common), then fallback to Unix timestamp
+        if let dateValue = try? container.decodeIfPresent(Date.self, forKey: .lastUpdate) {
+            self.lastUpdate = dateValue
+        } else if let timestamp = try? container.decode(Double.self, forKey: .lastUpdate) {
+            self.lastUpdate = Date(timeIntervalSince1970: timestamp / 1000) // Convert milliseconds to seconds
+        } else {
+            self.lastUpdate = nil
+        }
     }
     
     // Custom encoding
@@ -311,6 +329,7 @@ public struct ChargingStation: Codable, Sendable {
         try container.encodeIfPresent(chargingPoolID, forKey: .chargingPoolID)
         try container.encodeIfPresent(dynamicPowerLevel, forKey: .dynamicPowerLevel)
         try container.encodeIfPresent(hardwareManufacturer, forKey: .hardwareManufacturer)
+        try container.encodeIfPresent(lastUpdate, forKey: .lastUpdate)
     }
 }
 
