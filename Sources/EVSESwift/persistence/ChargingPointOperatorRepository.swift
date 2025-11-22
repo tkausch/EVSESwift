@@ -34,8 +34,35 @@ public class ChargingPointOperatorRepository: ModelRepository {
     
     public let container: ModelContainer
     
+    /// A description
+    /// - Parameter container:
     public init(container: ModelContainer) {
         self.container = container
+        
+        // Load defaults synchronously - must complete before init returns
+        let semaphore = DispatchSemaphore(value: 0)
+        let containerCopy = container
+        Task {
+            let context = ModelContext(containerCopy)
+            
+            // Check if database contains any operators 
+            let descriptor = FetchDescriptor<ChargingPointOperatorModel>()
+            let count = try? context.fetchCount(descriptor)
+            
+            guard count == nil || count == 0 else {
+                semaphore.signal()
+                return
+            }
+
+            for operatorItem in ChargingPointOperator.all {
+                let model = ChargingPointOperatorModel(from: operatorItem)
+                context.insert(model)
+            }
+            
+            try? context.save()
+            semaphore.signal()
+        }
+        semaphore.wait()
     }
 }
 
@@ -56,51 +83,6 @@ extension ChargingPointOperatorRepository {
             }
         )
         return try context.fetch(descriptor).first
-    }
-    
-    /// Finds operators by name (case-insensitive partial match).
-    ///
-    /// - Parameter name: The name to search for (partial match).
-    /// - Returns: An array of matching charging point operators.
-    /// - Throws: An error if the fetch operation fails.
-    public func findByName(_ name: String) async throws -> [ChargingPointOperatorModel] {
-        let context = ModelContext(container)
-        let lowercasedName = name.lowercased()
-        let descriptor = FetchDescriptor<ChargingPointOperatorModel>(
-            sortBy: [SortDescriptor(\ChargingPointOperatorModel.name)]
-        )
-        let allOperators = try context.fetch(descriptor)
-        return allOperators.filter { $0.name.lowercased().contains(lowercasedName) }
-    }
-    
-    /// Finds all operators that provide real-time data.
-    ///
-    /// - Returns: An array of operators with real-time data support.
-    /// - Throws: An error if the fetch operation fails.
-    public func findWithRealTimeData() async throws -> [ChargingPointOperatorModel] {
-        let context = ModelContext(container)
-        let descriptor = FetchDescriptor<ChargingPointOperatorModel>(
-            predicate: #Predicate { op in
-                op.withRealTimeData == true
-            },
-            sortBy: [SortDescriptor(\ChargingPointOperatorModel.name)]
-        )
-        return try context.fetch(descriptor)
-    }
-    
-    /// Finds all operators without real-time data.
-    ///
-    /// - Returns: An array of operators without real-time data support.
-    /// - Throws: An error if the fetch operation fails.
-    public func findWithoutRealTimeData() async throws -> [ChargingPointOperatorModel] {
-        let context = ModelContext(container)
-        let descriptor = FetchDescriptor<ChargingPointOperatorModel>(
-            predicate: #Predicate { op in
-                op.withRealTimeData == false
-            },
-            sortBy: [SortDescriptor(\ChargingPointOperatorModel.name)]
-        )
-        return try context.fetch(descriptor)
     }
     
     /// Retrieves all charging point operators.
@@ -125,6 +107,49 @@ extension ChargingPointOperatorRepository {
         return try context.fetchCount(descriptor)
     }
     
+    /// Populates the database with all predefined charging point operators.
+    ///
+    /// This method loads all operators from `ChargingPointOperator.all` and stores them in the database.
+    /// Existing operators with the same ID will be skipped.
+    ///
+    /// - Returns: The number of operators loaded.
+    /// - Throws: An error if the operation fails.
+    public func loadDefaults() async throws -> Int {
+        let context = ModelContext(container)
+        
+        // Check if database already contains operators
+        let descriptor = FetchDescriptor<ChargingPointOperatorModel>()
+        let count = try context.fetchCount(descriptor)
+        
+        guard count == 0 else {
+            return 0
+        }
+
+        for operatorItem in ChargingPointOperator.all {
+            let model = ChargingPointOperatorModel(from: operatorItem)
+            context.insert(model)
+        }
+        
+        try context.save()
+        return ChargingPointOperator.all.count
+    }
+    
+    /// Finds operators by name (case-insensitive partial match).
+    ///
+    /// - Parameter name: The name to search for.
+    /// - Returns: An array of matching operators.
+    /// - Throws: An error if the fetch operation fails.
+    public func findByName(_ name: String) async throws -> [ChargingPointOperatorModel] {
+        let context = ModelContext(container)
+        let descriptor = FetchDescriptor<ChargingPointOperatorModel>(
+            predicate: #Predicate { op in
+                op.name.localizedStandardContains(name)
+            }
+        )
+        return try context.fetch(descriptor)
+    }
+    
+    
     /// Deletes all charging point operators from the database.
     ///
     /// - Throws: An error if the delete operation fails.
@@ -132,37 +157,5 @@ extension ChargingPointOperatorRepository {
         let context = ModelContext(container)
         try context.delete(model: ChargingPointOperatorModel.self)
         try context.save()
-    }
-    
-    /// Populates the database with all predefined charging point operators.
-    ///
-    /// This method loads all operators from `ChargingPointOperator.all` and stores them in the database.
-    /// Existing operators with the same ID will be skipped.
-    ///
-    /// - Returns: The number of operators added to the database.
-    /// - Throws: An error if the operation fails.
-    public func loadDefaults() async throws -> Int {
-        let context = ModelContext(container)
-        var addedCount = 0
-        
-        for operatorItem in ChargingPointOperator.all {
-            // Check if operator already exists
-            let operatorID = operatorItem.operatorID
-            let descriptor = FetchDescriptor<ChargingPointOperatorModel>(
-                predicate: #Predicate { op in
-                    op.operatorID == operatorID
-                }
-            )
-            let existing = try context.fetch(descriptor)
-            
-            if existing.isEmpty {
-                let model = ChargingPointOperatorModel(from: operatorItem)
-                context.insert(model)
-                addedCount += 1
-            }
-        }
-        
-        try context.save()
-        return addedCount
     }
 }

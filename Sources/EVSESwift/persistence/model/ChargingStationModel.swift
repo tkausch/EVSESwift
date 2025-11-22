@@ -56,7 +56,10 @@ public final class ChargingStationModel {
     
     /// The Hub operator identifier for Hubject-compatible stations.
     public var hubOperatorID: String
-    
+
+    /// The CharingPointOperatorModel for this charging station - usinghubOperatorID.
+    @Relationship(deleteRule: .nullify) public var hubOperator: ChargingPointOperatorModel?
+
     /// The identifier for the charging pool this station belongs to.
     public var chargingPoolID: String?
     
@@ -146,6 +149,9 @@ public final class ChargingStationModel {
     /// The date this record was last updated.
     public var lastUpdated: Date
     
+    // MARK: - Dynamic Status Data
+    public var status: EVSEStatus?
+
     // MARK: - Relationships
     
     /// The charging facilities available at this station.

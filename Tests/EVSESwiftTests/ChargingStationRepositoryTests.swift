@@ -124,26 +124,6 @@ import Testing
         print("✅ Found \(stationsInCity.count) stations in \(city)")
     }
     
-    /// Test finding stations by country
-    @Test func testFindByCountry() async throws {
-        // Create stations from fixture
-        let stationModels = chargingStations.map { station in
-            ChargingStationModel(from: station)
-        }
-        try await repository.create(stationModels)
-        
-        // Get country from first station
-        let firstStation = try #require(chargingStations.first)
-        let country = firstStation.address.country
-        
-        let stationsInCountry = try await repository.findByCountry(country)
-        
-        #expect(!stationsInCountry.isEmpty)
-        #expect(stationsInCountry.allSatisfy { $0.address?.country == country })
-        
-        print("✅ Found \(stationsInCountry.count) stations in \(country)")
-    }
-    
     /// Test finding station by ID
     @Test func testFindById() async throws {
         // Create stations from fixture
@@ -179,36 +159,6 @@ import Testing
         #expect(stationsWithType2.allSatisfy { $0.plugs.contains(plugType) })
         
         print("✅ Found \(stationsWithType2.count) stations with \(plugType) plug")
-    }
-    
-    /// Test finding 24-hour stations
-    @Test func testFind24HourStations() async throws {
-        // Create stations from fixture
-        let stationModels = chargingStations.map { station in
-            ChargingStationModel(from: station)
-        }
-        try await repository.create(stationModels)
-        
-        let open24HourStations = try await repository.find24HourStations()
-        
-        #expect(open24HourStations.allSatisfy { $0.isOpen24Hours == true })
-        
-        print("✅ Found \(open24HourStations.count) 24-hour accessible stations")
-    }
-    
-    /// Test finding renewable energy stations
-    @Test func testFindRenewableEnergyStations() async throws {
-        // Create stations from fixture
-        let stationModels = chargingStations.map { station in
-            ChargingStationModel(from: station)
-        }
-        try await repository.create(stationModels)
-        
-        let renewableStations = try await repository.findRenewableEnergyStations()
-        
-        #expect(renewableStations.allSatisfy { $0.renewableEnergy == true })
-        
-        print("✅ Found \(renewableStations.count) stations using renewable energy")
     }
     
     /// Test updating a station (verifies persistence works)

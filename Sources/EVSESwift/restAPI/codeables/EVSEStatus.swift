@@ -13,7 +13,7 @@ public enum EVSEStatus: String, Codable, Sendable {
             self = .available
         case "outofservice":
             self = .outOfService
-        case "unknown":
+        case "unknown", "evsenotfound":
             self = .unknown
         case "occupied":
             self = .occupied

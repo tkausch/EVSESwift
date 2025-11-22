@@ -90,54 +90,6 @@ extension ChargingStationRepository {
         return try context.fetch(descriptor).first
     }
     
-    /// Finds all 24-hour accessible charging stations.
-    ///
-    /// - Returns: An array of charging stations that are open 24 hours.
-    /// - Throws: An error if the fetch operation fails.
-    public func find24HourStations() async throws -> [ChargingStationModel] {
-        let context = ModelContext(container)
-        let descriptor = FetchDescriptor<ChargingStationModel>(
-            predicate: #Predicate { station in
-                station.isOpen24Hours == true
-            },
-            sortBy: [SortDescriptor(\ChargingStationModel.address?.city)]
-        )
-        return try context.fetch(descriptor)
-    }
-    
-    /// Finds all charging stations using renewable energy.
-    ///
-    /// - Returns: An array of charging stations that use renewable energy.
-    /// - Throws: An error if the fetch operation fails.
-    public func findRenewableEnergyStations() async throws -> [ChargingStationModel] {
-        let context = ModelContext(container)
-        let descriptor = FetchDescriptor<ChargingStationModel>(
-            predicate: #Predicate { station in
-                station.renewableEnergy == true
-            },
-            sortBy: [SortDescriptor(\ChargingStationModel.address?.city)]
-        )
-        return try context.fetch(descriptor)
-    }
-    
-    /// Finds all charging stations in a specific country.
-    ///
-    /// - Parameter country: The country name to search for.
-    /// - Returns: An array of charging stations in the specified country.
-    /// - Throws: An error if the fetch operation fails.
-    public func findByCountry(_ country: String) async throws -> [ChargingStationModel] {
-        let context = ModelContext(container)
-        let descriptor = FetchDescriptor<ChargingStationModel>(
-            predicate: #Predicate { station in
-                station.address?.country == country
-            },
-            sortBy: [
-                SortDescriptor(\ChargingStationModel.address?.city),
-                SortDescriptor(\ChargingStationModel.stationName)
-            ]
-        )
-        return try context.fetch(descriptor)
-    }
     
     /// Finds all charging stations with a specific postal code.
     ///
@@ -150,6 +102,18 @@ extension ChargingStationRepository {
             predicate: #Predicate { station in
                 station.address?.postalCode == postalCode
             },
+            sortBy: [SortDescriptor(\ChargingStationModel.stationName)]
+        )
+        return try context.fetch(descriptor)
+    }
+    
+    /// Retrieves all charging stations from the database.
+    ///
+    /// - Returns: An array of all charging stations, sorted by station name.
+    /// - Throws: An error if the fetch operation fails.
+    public func findAll() async throws -> [ChargingStationModel] {
+        let context = ModelContext(container)
+        let descriptor = FetchDescriptor<ChargingStationModel>(
             sortBy: [SortDescriptor(\ChargingStationModel.stationName)]
         )
         return try context.fetch(descriptor)
@@ -173,4 +137,6 @@ extension ChargingStationRepository {
         try context.delete(model: ChargingStationModel.self)
         try context.save()
     }
+
+
 }

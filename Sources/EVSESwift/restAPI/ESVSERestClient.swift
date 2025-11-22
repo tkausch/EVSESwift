@@ -25,7 +25,7 @@ import Foundation
 import SwiftRestRequests
 
 /// REST client for accessing the Swiss EVSE (ich-tanke-strom.ch) dataset hosted on data.geo.admin.ch
-public final class ESVSERestClient: RestApiCaller, EVSEDataFetching, EVSEStatusesFetching {
+public final class ESVSERestClient: RestApiCaller, EVSEDataFetching, EVSEStatusFetching {
     public static let baseURLString = "https://data.geo.admin.ch/ch.bfe.ladestellen-elektromobilitaet/"
     public static let dataEndpoint = "data/oicp/ch.bfe.ladestellen-elektromobilitaet.json"
     public static let statusEndpoint = "status/oicp/ch.bfe.ladestellen-elektromobilitaet.json"

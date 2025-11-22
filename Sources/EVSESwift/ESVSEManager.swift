@@ -13,8 +13,8 @@ import SwiftData
 /// `ESVSEManager` provides a simple API to fetch charging stations from the remote API
 /// and automatically caches them in a persistent SwiftData store. Once cached, all subsequent
 /// calls return the cached `ChargingStationModel` data until explicitly cleared.
-public final class ESVSEManager {
-    private let dataFetcher: EVSEDataFetching
+public final class EVSEManager {
+    private let dataFetcher: EVSEDataFetching & EVSEStatusFetching
     private let stationRepository: ChargingStationRepository
     private let operatorRepository: ChargingPointOperatorRepository
     
@@ -38,7 +38,7 @@ public final class ESVSEManager {
     ///   - repository: A repository instance for caching (can use in-memory for testing)
     ///   - operatorRepository: A repository instance for operator data (can use in-memory for testing)
     init(
-        fetcher: EVSEDataFetching,
+        fetcher: EVSEDataFetching & EVSEStatusFetching,
         repository: ChargingStationRepository,
         operatorRepository: ChargingPointOperatorRepository
     ) {
@@ -55,7 +55,7 @@ public final class ESVSEManager {
     /// - Parameter forceRefresh: If true, ignores cache and fetches fresh data from API
     /// - Returns: An array of `ChargingStationModel` from the persistent store
     /// - Throws: An error if fetching from API fails or repository operations fail
-    public func getChargingStations(forceRefresh: Bool = false) async throws -> [ChargingStationModel] {
+    public func findAll(forceRefresh: Bool = false) async throws -> [ChargingStationModel] {
         // Check cache first unless forceRefresh is requested
         if !forceRefresh {
             let cachedModels: [ChargingStationModel] = try await stationRepository.read(sortBy: SortDescriptor(\ChargingStationModel.chargingStationId))
@@ -63,33 +63,42 @@ public final class ESVSEManager {
                 return cachedModels
             }
         }
-        
-        // Fetch fresh data from API
-        let root = try await dataFetcher.getEVSEData()
-        let stations = root.evseData.flatMap { $0.evseDataRecord }
-        
-        try await clearCache()
-
-        // load operators 
-        _ = try await operatorRepository.loadDefaults() 
-
-        // Update cache
-        try await updateCache(with: stations)
-        
-        // Return cached models
-        return try await stationRepository.read(sortBy: SortDescriptor(\ChargingStationModel.chargingStationId))
-    }
-    
-    /// Clears all cached charging stations.
-    public func clearCache() async throws {
+        // Fetch fresh data from API - clear existing cache
         try await stationRepository.deleteAll()
-        try await operatorRepository.deleteAll()
+
+        // Fetch fresh station data from API
+        let root = try await dataFetcher.getEVSEData()
+        let chargingStations = root.evseData.flatMap { $0.evseDataRecord }
+
+        try await updateChargingStationCache(with: chargingStations)
+
+        try await updateStatusOfAllChargingStations()
+
+        // Return cached models
+        return try await stationRepository.findAll()
     }
-    
-    /// Returns the number of cached stations.
-    public func getCachedStationCount() async throws -> Int {
-        return try await stationRepository.countStations()
+
+
+    public func updateStatusOfAllChargingStations() async throws {
+        
+        // Query all evseStatuses from charging stations by API
+        let evseStatuses = try await dataFetcher.getEVSEStatuses()
+        
+        // extract all evseStatusRecords
+        var allStatusRecords: [EVSEStatusRecord] = []
+        for operatorStatus in evseStatuses.evseStatuses {
+            allStatusRecords.append(contentsOf: operatorStatus.evseStatusRecords)
+        }
+
+        for evseStatus in allStatusRecords {
+           if let chargingStation = try await stationRepository.findById(evseStatus.evseID) {
+                chargingStation.status = evseStatus.evseStatus
+                try await stationRepository.update(chargingStation) 
+           }
+        }
+
     }
+
     
     // MARK: - Query Methods
     
@@ -100,15 +109,6 @@ public final class ESVSEManager {
     /// - Throws: An error if the fetch operation fails.
     public func findByCity(_ city: String) async throws -> [ChargingStationModel] {
         return try await stationRepository.findByCity(city)
-    }
-    
-    /// Finds all charging stations in a specific country.
-    ///
-    /// - Parameter country: The country name to search for.
-    /// - Returns: An array of charging stations in the specified country.
-    /// - Throws: An error if the fetch operation fails.
-    public func findByCountry(_ country: String) async throws -> [ChargingStationModel] {
-        return try await stationRepository.findByCountry(country)
     }
     
     /// Finds all charging stations with a specific postal code.
@@ -138,22 +138,6 @@ public final class ESVSEManager {
         return try await stationRepository.findById(id)
     }
     
-    /// Finds all 24-hour accessible charging stations.
-    ///
-    /// - Returns: An array of charging stations that are open 24 hours.
-    /// - Throws: An error if the fetch operation fails.
-    public func find24HourStations() async throws -> [ChargingStationModel] {
-        return try await stationRepository.find24HourStations()
-    }
-    
-    /// Finds all charging stations using renewable energy.
-    ///
-    /// - Returns: An array of charging stations that use renewable energy.
-    /// - Throws: An error if the fetch operation fails.
-    public func findRenewableEnergyStations() async throws -> [ChargingStationModel] {
-        return try await stationRepository.findRenewableEnergyStations()
-    }
-    
     // MARK: - Charging Point Operator Methods
     
     /// Finds a charging point operator by its unique identifier.
@@ -174,22 +158,6 @@ public final class ESVSEManager {
         return try await operatorRepository.findByName(name)
     }
     
-    /// Finds all operators that provide real-time data.
-    ///
-    /// - Returns: An array of operators with real-time data support.
-    /// - Throws: An error if the fetch operation fails.
-    public func findOperatorsWithRealTimeData() async throws -> [ChargingPointOperatorModel] {
-        return try await operatorRepository.findWithRealTimeData()
-    }
-    
-    /// Finds all operators without real-time data.
-    ///
-    /// - Returns: An array of operators without real-time data support.
-    /// - Throws: An error if the fetch operation fails.
-    public func findOperatorsWithoutRealTimeData() async throws -> [ChargingPointOperatorModel] {
-        return try await operatorRepository.findWithoutRealTimeData()
-    }
-    
     /// Retrieves all charging point operators.
     ///
     /// - Returns: An array of all operators sorted by name.
@@ -206,17 +174,10 @@ public final class ESVSEManager {
         return try await operatorRepository.countOperators()
     }
     
-    /// Loads the default charging point operators into the database.
-    ///
-    /// - Returns: The number of operators added to the database.
-    /// - Throws: An error if the operation fails.
-    public func loadOperators() async throws -> Int {
-        return try await operatorRepository.loadDefaults()
-    }
     
     // MARK: - Private Methods
     
-    private func updateCache(with stations: [ChargingStation]) async throws {
+    private func updateChargingStationCache(with stations: [ChargingStation]) async throws {
         // Clear existing cache
         try await stationRepository.deleteAll()
         
@@ -232,7 +193,12 @@ public final class ESVSEManager {
         }
         
         // Convert to models and save
-        let models = uniqueStations.map { ChargingStationModel(from: $0) }
+        var models: [ChargingStationModel] = []
+        for station in uniqueStations { 
+            let chargingStationModel = ChargingStationModel(from: station) 
+            chargingStationModel.hubOperator = try? await operatorRepository.findById(chargingStationModel.hubOperatorID)
+            models.append(chargingStationModel)
+        }
         try await stationRepository.create(models)
     }
 }

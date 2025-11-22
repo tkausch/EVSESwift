@@ -1,4 +1,4 @@
 
-public protocol EVSEStatusesFetching {
+public protocol EVSEStatusFetching {
     func getEVSEStatuses() async throws -> EVSEStatuses
 }
